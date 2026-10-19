@@ -1,0 +1,6 @@
+venv/
+uploads/
+sanitized/
+__pycache__/
+*.pyc
+.env
