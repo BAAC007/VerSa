@@ -17,7 +17,6 @@ def sanitizar_pdf(ruta_entrada: str, ruta_salida: str) -> bool:
         
         with open(ruta_salida, "wb") as f:
             escritor.write(f)
-            
         return True
     except Exception as e:
         print(f"Error sanitizando PDF: {e}")
@@ -25,12 +24,7 @@ def sanitizar_pdf(ruta_entrada: str, ruta_salida: str) -> bool:
 
 def sanitizar_imagen(ruta_entrada: str, ruta_salida: str) -> bool:
     try:
-        subprocess.run(
-            ["exiftool", "-all=", "-overwrite_original", ruta_entrada],
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
-        )
+        subprocess.run(["exiftool", "-all=", "-overwrite_original", ruta_entrada], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         os.rename(ruta_entrada, ruta_salida)
         return True
     except Exception as e:

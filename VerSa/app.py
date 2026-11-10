@@ -2,13 +2,30 @@ import streamlit as st
 import os
 from core.sanitizador import sanitizar_pdf, sanitizar_imagen
 from core.analizador import extraer_texto_pdf, analizar_con_ia_local
+from core.historial import init_db, guardar_analisis, obtener_historial
 
-st.set_page_config(page_title="VerSa | Investigación Segura", page_icon="🛡️", layout="centered")
+# Inicializar base de datos al arrancar la app
+init_db()
+
+st.set_page_config(page_title="VerSa | Investigación Segura", page_icon="🛡️", layout="wide")
 
 st.title("🛡️ VerSa")
 st.markdown("### Ingesta, Sanitización y Análisis Local")
 st.info("Los archivos se procesan en tu máquina. Nada sale a la nube.")
 
+# --- Barra lateral para el historial ---
+with st.sidebar:
+    st.header("📜 Historial de Análisis")
+    historial = obtener_historial()
+    
+    if not historial:
+        st.caption("No hay análisis guardados aún.")
+    else:
+        for item in historial:
+            with st.expander(f"**{item['nombre_archivo']}**\n*{item['fecha']}*"):
+                st.markdown(item['analisis_completo'].replace("\n", "  \n"))
+
+# --- Área principal de carga ---
 uploaded_file = st.file_uploader("Arrastra un PDF o Imagen aquí", type=["pdf", "jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
@@ -33,13 +50,18 @@ if uploaded_file is not None:
     if exito:
         st.success("✅ Documento sanitizado correctamente.")
         
+        analisis_resultado = ""
+        
         if nombre_original.lower().endswith('.pdf'):
             with st.spinner("🤖 Qwen2.5 está analizando el contenido..."):
                 texto = extraer_texto_pdf(ruta_limpia)
-                analisis = analizar_con_ia_local(texto)
+                analisis_resultado = analizar_con_ia_local(texto)
                 
             st.markdown("### 📝 Análisis de VerSa")
-            st.markdown(analisis.replace("\n", "  \n"))
+            st.markdown(analisis_resultado.replace("\n", "  \n"))
+            
+            # Guardar en el historial
+            guardar_analisis(nombre_original, analisis_resultado)
             
         with open(ruta_limpia, "rb") as f:
             st.download_button(

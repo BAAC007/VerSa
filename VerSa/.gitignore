@@ -1,24 +1,7 @@
-# Entorno virtual
 venv/
-env/
-
-# Archivos de procesamiento (NUNCA subir datos reales)
 uploads/
 sanitized/
-*.tmp
-
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
-.Python
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Variables de entorno y logs
+*.pyc
 .env
-*.log
+versa.db
